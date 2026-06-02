@@ -137,16 +137,60 @@ bool inside(int x, int y, int n, int m) {
 
 /* ===================== SOLVER ===================== */
 void solve() {
-    ll n,k;
-    cin>>n>>k;
-    if(k%3!=0){
-       if(n%3==0) cout<<"Bob"<<endl;
-       else cout<<"Alice"<<endl;
+    ll n;
+    cin>>n;
+    vll pos1,pos2;
+    ll val;
+    for (ll i=0;i<n;i++) {
+        cin>>val;
+        if(val == 1) pos1.pb(i);
+        else pos2.pb(i);
     }
-    else{  
-        ll rem=n%(k+1);
-        if(rem%3==0&&rem!=k) cout<<"Bob"<<endl;
-        else cout<<"Alice"<<endl;
+    vpll ans;
+    ll curr;
+    ll s1,s2,winner;
+    for(ll t=1;t<=n;t++) {
+        curr=-1;
+        s1 = 0, s2 = 0;
+        winner = 0;
+        bool possible = true;
+        while (curr < n-1) {
+            ll p1_cnt = upper_bound(all(pos1),curr) - pos1.begin();
+            ll p2_cnt = upper_bound(all(pos2),curr) - pos2.begin();
+            ll next1 = INFLL, next2 = INFLL;
+            if (p1_cnt+t<=sz(pos1)) {
+                next1 = pos1[p1_cnt + t - 1];
+            }
+            if (p2_cnt+t<=sz(pos2)) {
+                next2 = pos2[p2_cnt + t - 1];
+            }
+            if (next1==INFLL && next2==INFLL) {
+                possible = false;
+                break;
+            }
+            if (next1<next2) {
+                s1++;
+                curr = next1;
+                winner = 1;
+            }
+            else {
+                s2++;
+                curr = next2;
+                winner = 2;
+            }
+        }
+        if (possible && curr==n-1) {
+            if (s1>s2 && winner==1) {
+                ans.pb({s1, t});
+            } else if (s2>s1 && winner==2) {
+                ans.pb({s2,t});
+            }
+        }
+    }
+    sort(all(ans));
+    cout<<sz(ans)<<endl;
+    for (auto p:ans) {
+        cout<<p.first<<" "<<p.second<<endl;
     }
 }
 
@@ -154,7 +198,7 @@ void solve() {
 int main() {
     fastio();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--) solve();
     return 0;
 }

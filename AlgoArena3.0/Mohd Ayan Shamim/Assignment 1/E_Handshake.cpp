@@ -134,27 +134,63 @@ int dy[4] = {0, 0, 1, -1};
 bool inside(int x, int y, int n, int m) {
     return x >= 0 && y >= 0 && x < n && y < m;
 }
-
+ll check(ll mid,vll a){
+    ll n=a.size();
+    ll l=0;
+    ll h=n-1;
+    ll res=0;
+    for(ll i=0;i<n;i++){
+        auto k = lower_bound(all(a),mid-a[i]);
+        res += n-(k-a.begin());
+    }
+    return res;//how many elements are >=mid
+}
 /* ===================== SOLVER ===================== */
 void solve() {
-    ll n,k;
-    cin>>n>>k;
-    if(k%3!=0){
-       if(n%3==0) cout<<"Bob"<<endl;
-       else cout<<"Alice"<<endl;
+    ll n;
+    cin>>n;
+    ll m;
+    cin>>m;
+    vll a(n);vll psum(n+1);
+    psum[0]=0;
+    for(ll i=0;i<n;i++){
+        cin>>a[i];
     }
-    else{  
-        ll rem=n%(k+1);
-        if(rem%3==0&&rem!=k) cout<<"Bob"<<endl;
-        else cout<<"Alice"<<endl;
+    sort(all(a));
+    for(ll i=0;i<n;i++){
+        psum[i+1]=psum[i]+a[i];
     }
+    ll l=0;
+    ll h=2*a[n-1];
+    ll mid;
+    ll msum=0;
+    while(l<=h){
+        mid=l+(h-l)/2;
+        if(check(mid,a)>=m){
+            l=mid+1;
+            msum=mid;
+        }
+        else{
+            h=mid-1;
+        }
+    }
+    ll ans=0;
+    ll pairs_counted=0;
+    for(ll i=0;i<n;i++){
+        auto k = lower_bound(all(a),msum-a[i]);
+        ans+=psum[n]-psum[k-a.begin()]+(n-(k-a.begin()))*a[i];
+        pairs_counted+=n-(k-a.begin());
+    }
+    if(pairs_counted > m){
+        ans -= (pairs_counted - m) * msum;
+    }
+    cout<<ans<<endl;
 }
-
 /* ===================== MAIN ===================== */
 int main() {
     fastio();
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while (t--) solve();
     return 0;
 }
